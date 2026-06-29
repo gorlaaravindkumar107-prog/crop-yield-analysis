@@ -1,0 +1,15 @@
+create  view powerbi_farm_dashboard
+as select
+plot_id,
+crop_type,
+season,
+production,
+fertilizer_used,
+water_usage,
+market_price,
+total_cost,
+net_profit
+from crop_yield_final;
+
+select * from powerbi_farm_dashboard
+limit 10;

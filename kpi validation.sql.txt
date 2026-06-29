@@ -1,0 +1,23 @@
+-- yield effeciency kpi
+select plot_id,
+crop_type,
+production,
+fertilizer_used,
+round(production/nullif(fertilizer_used,0),4)
+as yield_efficiency
+from crop_yield_final;
+
+-- avg effeiciency by crop
+select 
+crop_type,round(avg(production/nullif(fertilizer_used,0)),4)
+as avg_yield_efficiency
+from crop_yield_final
+group by crop_type;
+
+-- regional utilisation kpi
+select 
+location,
+round(sum(production)/nullif(sum(size),0),2)
+as regional_utilisation
+from crop_yield_final
+group by location;

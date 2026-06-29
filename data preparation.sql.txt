@@ -1,0 +1,159 @@
+ CREATE TABLE CROP_YIELD_final AS
+ SELECT
+ p.plot_id,
+ p.location,
+ p.size,
+ s.season,
+ s.crop_type,
+ s.yield_amount,
+ s.fertilizer_used,
+ s.water_usage,
+ s.market_price,
+ e.labour_cost,
+ e.seed_cost
+ from plots p
+ join seasonal_records s
+ on p.plot_id = s.plot_id
+ join expenses e
+ on s.record_id = e.record_id
+ WHERE trim(lower(s.season))<>"whole year";
+
+select * from seasonal_records
+where crop_type is null or
+season is null or yield_amount is null
+ or water_usage is null or fertilizer_used is null;
+
+-- duplicates 
+ select crop_type,fertilizer_used,water_usage ,
+ count(*) from seasonal_records
+ group by  crop_type,fertilizer_used,water_usage 
+ having count(*)>1;
+ 
+-- invalid 
+ select * from seasonal_records where fertilizer_used<0;
+ 
+ -- standardise
+ update seasonal_records
+ set crop_type  = upper(crop_type);
+ 
+ -- remove extra space
+ update seasonal_records
+ set crop_type  = trim(crop_type);
+ 
+ 
+ select *from expenses 
+ where labour_cost is null or 
+ seed_cost is null;
+ 
+ CREATE TABLE CROP_YIELD_final AS
+ SELECT
+ p.plot_id,
+ p.location,
+ p.size,
+ s.season,
+ s.crop_type,
+ s.yield_amount,
+ s.fertilizer_used,
+ s.water_usage,
+ s.market_price,
+ e.labour_cost,
+ e.seed_cost
+ from plots p
+ join seasonal_records s
+ on p.plot_id = s.plot_id
+ join expenses e
+ on s.record_id = e.record_id
+ WHERE trim(lower(s.season))<>"whole year";
+ 
+ select count(*)from  CROP_YIELD_final;
+ 
+ select distinct season from seasonal_records;
+ 
+ select * from  CROP_YIELD_final;
+ 
+ alter table CROP_YIELD_final add production decimal(10,2);
+ 
+ update CROP_YIELD_final
+ set production = size * yield_amount;
+ 
+ update CROP_YIELD_final
+ set production = coalesce(size,0)*
+ coalesce(yield_amount,0);
+ 
+ select size,yield_amount,production from CROP_YIELD_final limit 10;
+ 
+ update CROP_YIELD_final
+ set production = size* yield_amount;
+ 
+ describe CROP_YIELD_final;
+ 
+ select * from CROP_YIELD_final
+ where size is null
+ or yield_amount is null;
+ 
+  update CROP_YIELD_final
+ set production = coalesce(size,0)*
+ coalesce(yield_amount,0);
+ 
+ select size,yield_amount,production
+ from CROP_YIELD_final
+ limit 20;
+ 
+ show create table CROP_YIELD_final;
+ 
+create table production_table(
+production decimal(15,2)); 
+ 
+ select size,yield_amount
+ from crop_yield_final
+ limit 10;
+ 
+ update crop_yield_final
+ set production = size * yield_amount;
+ 
+ 
+ set sql_safe_updates = 0;
+ 
+select * from  CROP_YIELD_final;
+
+
+alter table crop_yield_final
+add column total_cost decimal(15,2);
+
+update crop_yield_final
+set total_cost = labour_cost+seed_cost+(fertilizer_used*10);
+
+alter table crop_yield_final
+add column net_profit decimal(15,2);
+
+alter table crop_yield_final
+add column total_revenue decimal(15,2);
+
+update crop_yield_final
+set net_profit = total_revenue- total_cost;
+
+create table profit_summary as 
+select plot_id,total_revenue,total_cost,net_profit
+from crop_yield_final;
+
+select * from profit_summary;
+
+alter table profit_summary
+add column crop_type varchar(100);
+alter table profit_summary
+add column season varchar(50);
+
+describe profit_summary;
+
+
+update crop_yield_final
+set total_revenue = production*market_price;
+
+
+select * from  CROP_YIELD_final;
+
+
+select size,yield_amount,production
+from crop_yield_final
+limit 20;
+

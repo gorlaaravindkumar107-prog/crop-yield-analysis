@@ -1,0 +1,56 @@
+select crop_type,
+season,
+production,
+lag(production) over(
+partition by crop_type
+order by season)
+as previous_season_production,
+round((production-lag(production) over(
+partition by crop_type
+order by season))*100/
+lag(production) over(
+partition by crop_type
+order by season),2)as growth_percentage
+from crop_yield_final;
+
+create table seasonal_growth_trends as
+select
+crop_type,
+season,production,
+lag(production) over(
+partition by crop_type
+order by season)
+as previous_season_production,
+round((production-
+lag(production) over(
+partition by crop_type
+order by season))*100/
+nullif (lag(production) over(
+partition by crop_type
+order by season),
+0),2)as growth_percentage
+from crop_yield_final;
+
+drop table seasonal_growth_trends;
+
+create table seasonal_growth_trends as 
+with growth_data as(
+select
+crop_type,
+season,production,
+lag(production) over(
+partition by crop_type
+order by season
+) as previous_season_production
+from crop_yield_final)
+select crop_type,season,
+production,
+round((production-previous_season_production)*100/
+nullif(previous_season_production,0),2)
+as growth_percentage
+from growth_data;
+
+select count(*) 
+from seasonal_growth_trends;
+select * from
+seasonal_growth_trends;
